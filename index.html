@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="규호 ❤ 태은의 결혼식에 초대합니다">
 <meta property="og:description" content="2026.04.26 (일) 오후 3:30 · 더청담 노블레스 2F">
-<meta property="og:image" content="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/dec90ae7-4fbc-427c-870c-b7c895e6b629.jpg">
+<meta property="og:image" content="assets/01.jpg">
 <meta property="og:locale" content="ko_KR">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,7 +80,7 @@ section + section { border-top: 1px solid var(--line-soft); }
   inset: 0;
   background-size: cover;
   background-position: center 30%;
-  background-image: url('https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/dec90ae7-4fbc-427c-870c-b7c895e6b629.jpg');
+  background-image: url('assets/01.jpg');
   filter: sepia(0.08) saturate(0.92) brightness(0.96);
 }
 .cover-photo::after {
@@ -803,9 +803,87 @@ section + section { border-top: 1px solid var(--line-soft); }
 /* ============ Reveal ============ */
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity 1.1s ease, transform 1.1s ease; }
 .reveal.in { opacity: 1; transform: translateY(0); }
+
+/* ============ BGM toggle ============ */
+.bgm-toggle {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(212px);  /* anchor to right edge of 480px container */
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(43, 39, 35, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: background 0.3s, opacity 0.3s;
+  cursor: pointer;
+}
+@media (max-width: 510px) {
+  .bgm-toggle { left: auto; right: 14px; transform: none; }
+}
+.bgm-toggle svg { width: 16px; height: 16px; }
+.bgm-toggle.muted { opacity: 0.55; }
+.bgm-toggle::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--rose);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.bgm-toggle.playing::before {
+  opacity: 1;
+  animation: bgmSpin 2.4s linear infinite;
+}
+@keyframes bgmSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.bgm-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+.bgm-bar span {
+  display: block;
+  width: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  height: 4px;
+  transition: height 0.2s;
+}
+.bgm-toggle.playing .bgm-bar span:nth-child(1) { animation: bgmBar 0.8s ease-in-out infinite; }
+.bgm-toggle.playing .bgm-bar span:nth-child(2) { animation: bgmBar 0.8s ease-in-out infinite 0.15s; }
+.bgm-toggle.playing .bgm-bar span:nth-child(3) { animation: bgmBar 0.8s ease-in-out infinite 0.3s; }
+.bgm-toggle.playing .bgm-bar span:nth-child(4) { animation: bgmBar 0.8s ease-in-out infinite 0.45s; }
+@keyframes bgmBar {
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
+}
 </style>
 </head>
 <body>
+<!-- Background music: 본인이 라이선스 보유한 음원 파일을 assets/bgm.mp3 로 추가 -->
+<audio id="bgm" loop preload="metadata">
+  <source src="assets/bgm.mp3" type="audio/mpeg">
+</audio>
+<button class="bgm-toggle muted" id="bgmToggle" aria-label="배경음악 재생/일시정지">
+  <span class="bgm-bar" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+  </span>
+</button>
+
 <main class="invitation">
 
   <!-- ===== COVER ===== -->
@@ -969,15 +1047,15 @@ section + section { border-top: 1px solid var(--line-soft); }
     <h2 class="section-title">우리의 순간들</h2>
 
     <div class="gallery-scroll" id="gallery">
-      <div class="gallery-item" data-idx="0"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/dec90ae7-4fbc-427c-870c-b7c895e6b629.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="1"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/cc79f353-4962-4724-b8df-a59b53540f7f.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="2"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/8912a2bb-3bbc-4e91-881f-b92f7b203255.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="3"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/141bf289-e633-4e3a-943f-f8ef92e6c85f.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="4"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/db476932-4298-4898-8fef-5cb26e27839e.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="5"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/aeb154c8-f22d-44d4-8252-4548a23ed6f8.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="6"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/5f1c1e4f-382a-44f9-b23f-87cdcc33e4ee.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="7"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/9ffdc041-0518-4c30-9bab-ee2d6a1e68c7.jpg" alt="" loading="lazy"></div>
-      <div class="gallery-item" data-idx="8"><img src="https://mcard-resources.barunsoncard.com/upload/invitation/260225/1138414/gallery/009fdde8-7e1d-4d6c-9fed-3a19c1ba2185.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="0"><img src="assets/01.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="1"><img src="assets/02.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="2"><img src="assets/03.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="3"><img src="assets/04.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="4"><img src="assets/05.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="5"><img src="assets/06.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="6"><img src="assets/07.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="7"><img src="assets/08.jpg" alt="" loading="lazy"></div>
+      <div class="gallery-item" data-idx="8"><img src="assets/09.jpg" alt="" loading="lazy"></div>
     </div>
     <div class="gallery-counter"><span id="galleryCount">01</span> / 09 — Swipe</div>
   </section>
@@ -1303,6 +1381,38 @@ document.getElementById('fabShare').addEventListener('click', async () => {
     } catch { showToast('주소창에서 복사해 주세요'); }
   }
 });
+
+// ============ BGM toggle ============
+(function () {
+  const bgm = document.getElementById('bgm');
+  const btn = document.getElementById('bgmToggle');
+  if (!bgm || !btn) return;
+  bgm.volume = 0.4;
+
+  btn.addEventListener('click', () => {
+    if (bgm.paused) {
+      bgm.play().then(() => {
+        btn.classList.add('playing');
+        btn.classList.remove('muted');
+      }).catch(() => {
+        showToast('음악 파일을 찾을 수 없어요');
+      });
+    } else {
+      bgm.pause();
+      btn.classList.remove('playing');
+      btn.classList.add('muted');
+    }
+  });
+
+  bgm.addEventListener('pause', () => {
+    btn.classList.remove('playing');
+    btn.classList.add('muted');
+  });
+  bgm.addEventListener('play', () => {
+    btn.classList.add('playing');
+    btn.classList.remove('muted');
+  });
+})();
 
 // ============ Reveal on scroll ============
 const io = new IntersectionObserver((entries) => {
