@@ -1,0 +1,25 @@
+{
+  "title": "규호 ❤ 태은의 결혼식에 초대합니다",
+  "groom": {
+    "name": "정규호",
+    "nameRoman": "Gueho"
+  },
+  "bride": {
+    "name": "김태은",
+    "nameRoman": "Taeeun"
+  },
+  "greeting": "영혼의 단짝을 만나\n눈 깜빡할 새에 결혼합니다.\n\n가장 설레는 이 순간을\n함께 웃으며 축하해 주세요.",
+  "coverImage": "assets/01.jpg",
+  "gallery": [
+    "assets/01.jpg",
+    "assets/02.jpg",
+    "assets/03.jpg",
+    "assets/04.jpg",
+    "assets/05.jpg",
+    "assets/06.jpg",
+    "assets/07.jpg",
+    "assets/08.jpg",
+    "assets/09.jpg"
+  ],
+  "bgm": "assets/bgm.mp3"
+}

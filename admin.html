@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>청첩장 관리자 · Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5EFE6;
+  --paper: #FAF6EE;
+  --ink: #2B2723;
+  --ink-soft: #6B6359;
+  --ink-muted: #9A9285;
+  --accent: #B08968;
+  --rose: #C9A09A;
+  --line: #DDD3C2;
+  --line-soft: #E8E0CF;
+  --danger: #B85042;
+  --success: #5C8D67;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  font-weight: 300;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; }
+input, textarea { font-family: inherit; }
+
+.lat { font-family: 'Cormorant Garamond', serif; }
+.kor { font-family: 'Gowun Batang', serif; }
+
+/* ===== Layout ===== */
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 100px;
+}
+.app-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.app-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  font-weight: 400;
+}
+.app-title em {
+  font-style: italic;
+  color: var(--rose);
+  font-weight: 400;
+}
+.app-sub {
+  font-family: 'Gowun Batang', serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+}
+
+/* ===== Login ===== */
+.login {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 32px 28px;
+  margin-top: 40px;
+}
+.login h2 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 16px;
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+}
+.login p.desc {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+  line-height: 1.85;
+}
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--rose);
+  margin-bottom: 6px;
+}
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: 11px 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--ink);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: var(--accent);
+}
+.field .hint {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.field .hint a { color: var(--accent); text-decoration: underline; }
+
+.btn {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  padding: 12px 28px;
+  font-family: 'Gowun Batang', serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+.btn:hover { background: var(--accent); }
+.btn:disabled { background: var(--ink-muted); cursor: not-allowed; }
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-weight: 400;
+}
+.btn.ghost:hover { background: var(--paper); border-color: var(--accent); color: var(--accent); }
+.btn.danger { background: var(--danger); }
+.btn.danger:hover { background: #962f24; }
+.btn.small { padding: 7px 14px; font-size: 11.5px; }
+
+/* ===== Editor ===== */
+.repo-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 12.5px;
+}
+.repo-meta .info { font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 0.05em; }
+.repo-meta .info b { font-weight: 500; }
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 28px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 14px 22px;
+  background: transparent;
+  border: none;
+  font-family: 'Gowun Batang', serif;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+.tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--rose);
+  font-weight: 700;
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.section-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 24px 22px;
+  margin-bottom: 20px;
+}
+.section-card h3 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.section-card .desc {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+  line-height: 1.7;
+}
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 540px) { .row-2 { grid-template-columns: 1fr; } }
+
+textarea.greeting-input {
+  min-height: 140px;
+  line-height: 2;
+  resize: vertical;
+}
+
+/* ===== Image picker ===== */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+@media (max-width: 540px) {
+  .image-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.image-thumb {
+  aspect-ratio: 3/4;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.image-thumb:hover { transform: scale(1.02); }
+.image-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.image-thumb.selected {
+  border: 2px solid var(--rose);
+  outline: 2px solid var(--rose);
+  outline-offset: -1px;
+}
+.image-thumb .overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(43, 39, 35, 0.6);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+.image-thumb:hover .overlay,
+.image-thumb.selected .overlay { opacity: 1; }
+.image-thumb .badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--rose);
+  color: #fff;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  padding: 2px 8px;
+  letter-spacing: 0.15em;
+}
+.image-thumb .order-num {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(43, 39, 35, 0.85);
+  color: #fff;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.image-thumb .ctrl-row {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.image-thumb:hover .ctrl-row { opacity: 1; }
+.image-thumb .ctrl-btn {
+  background: rgba(255,255,255,0.95);
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-weight: 700;
+}
+.image-thumb .ctrl-btn:hover { background: #fff; color: var(--accent); }
+.image-thumb .ctrl-btn.del { color: var(--danger); }
+
+.upload-zone {
+  border: 1.5px dashed var(--line);
+  background: var(--bg);
+  padding: 26px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(176, 137, 104, 0.06);
+}
+.upload-zone .icon {
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  font-family: 'Cormorant Garamond', serif;
+}
+.upload-zone .label {
+  font-family: 'Gowun Batang', serif;
+  font-size: 13.5px;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.upload-zone .sub {
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+.upload-zone input { display: none; }
+
+/* ===== BGM ===== */
+.bgm-current {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+.bgm-current .name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+}
+.bgm-current audio { max-width: 220px; }
+.bgm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.bgm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bgm-row:hover { border-color: var(--accent); }
+.bgm-row.selected { border-color: var(--rose); background: rgba(201, 160, 154, 0.08); }
+.bgm-row .lname { font-family: 'Cormorant Garamond', serif; font-size: 13px; }
+.bgm-row .actions { display: flex; gap: 6px; }
+
+/* ===== Save bar ===== */
+.save-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  z-index: 100;
+}
+.save-bar .save-msg {
+  color: var(--paper);
+  font-family: 'Gowun Batang', serif;
+  font-size: 12.5px;
+}
+.save-bar .save-msg.dirty { color: var(--rose); }
+.save-bar .save-btns { display: flex; gap: 10px; }
+.save-bar .btn { padding: 10px 22px; }
+.save-bar .btn:not(.ghost) { background: var(--rose); color: #fff; }
+.save-bar .btn:not(.ghost):hover { background: var(--accent); }
+.save-bar .btn.ghost { color: var(--paper); border-color: rgba(255,255,255,0.3); }
+.save-bar .btn.ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); color: var(--paper); }
+
+/* ===== Toast / Modal ===== */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-family: 'Gowun Batang', serif;
+  font-size: 13px;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 12, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 16px;
+}
+.modal.active { display: flex; }
+.modal-card {
+  background: var(--paper);
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  border: 1px solid var(--line);
+}
+.modal-card h3 {
+  font-family: 'Gowun Batang', serif;
+  font-size: 15px;
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+.modal-card p { font-size: 13px; line-height: 1.85; color: var(--ink-soft); margin-bottom: 18px; }
+.modal-card .actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-family: 'Gowun Batang', serif;
+}
+
+/* upload progress */
+.upload-progress {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 0.1em;
+}
+.upload-progress .bar {
+  height: 3px;
+  background: var(--line-soft);
+  margin-top: 4px;
+  overflow: hidden;
+}
+.upload-progress .bar > div {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.preview-link {
+  display: inline-block;
+  margin-top: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: underline;
+  letter-spacing: 0.05em;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="app-header">
+    <div>
+      <div class="app-title">Wedding <em>Admin</em></div>
+      <div class="app-sub">청첩장 관리자 페이지</div>
+    </div>
+    <button class="btn ghost small" id="logoutBtn" style="display:none;">Logout</button>
+  </header>
+
+  <!-- ===== LOGIN ===== -->
+  <section class="login" id="loginSection">
+    <h2>GitHub 연결</h2>
+    <p class="desc">
+      청첩장 repo에 사진·음악·설정을 직접 저장하기 위해 GitHub 인증이 필요합니다.<br>
+      입력한 토큰은 본인 브라우저에만 저장되며 어디로도 전송되지 않습니다.
+    </p>
+
+    <div class="field">
+      <label>GitHub Username</label>
+      <input type="text" id="ghOwner" placeholder="예: yourname" autocomplete="off">
+      <span class="hint">github.com/<b>yourname</b>/repo 의 yourname 부분</span>
+    </div>
+
+    <div class="field">
+      <label>Repository Name</label>
+      <input type="text" id="ghRepo" placeholder="예: alliswell426" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label>Branch</label>
+      <input type="text" id="ghBranch" placeholder="main" value="main" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label>Personal Access Token</label>
+      <input type="password" id="ghToken" placeholder="ghp_..." autocomplete="off">
+      <span class="hint">
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Wedding+Admin" target="_blank" rel="noopener">여기서 발급</a>
+        — Scopes는 <b>repo</b> 하나만 체크. 만료기간은 결혼식 이후로 넉넉히.
+      </span>
+    </div>
+
+    <button class="btn" id="loginBtn">접속하기</button>
+  </section>
+
+  <!-- ===== EDITOR ===== -->
+  <section id="editorSection" style="display:none;">
+
+    <div class="repo-meta">
+      <div class="info">
+        <b id="metaOwner"></b> / <b id="metaRepo"></b>
+        <span style="color:var(--ink-muted); margin-left:8px;" id="metaBranch"></span>
+      </div>
+      <a class="btn ghost small" id="previewBtn" target="_blank" rel="noopener">미리보기 ↗</a>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="text">텍스트</button>
+      <button class="tab" data-tab="cover">메인 이미지</button>
+      <button class="tab" data-tab="gallery">갤러리</button>
+      <button class="tab" data-tab="bgm">배경음악</button>
+    </div>
+
+    <!-- TAB 1 — TEXT -->
+    <div class="panel active" data-panel="text">
+      <div class="section-card">
+        <h3>이름</h3>
+        <p class="desc">커버 화면과 부모님 줄에 표시되는 이름입니다.</p>
+        <div class="row-2">
+          <div class="field">
+            <label>신랑 한글</label>
+            <input type="text" id="groomName" placeholder="정규호">
+          </div>
+          <div class="field">
+            <label>신랑 영문</label>
+            <input type="text" id="groomRoman" placeholder="Gueho">
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>신부 한글</label>
+            <input type="text" id="brideName" placeholder="김태은">
+          </div>
+          <div class="field">
+            <label>신부 영문</label>
+            <input type="text" id="brideRoman" placeholder="Taeeun">
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>인사말</h3>
+        <p class="desc">청첩장 본문 가운데 표시되는 글입니다. 줄바꿈은 그대로 반영됩니다.</p>
+        <div class="field">
+          <textarea class="greeting-input" id="greetingText" placeholder="인사말을 입력하세요"></textarea>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>페이지 제목</h3>
+        <p class="desc">브라우저 탭 제목 + 카카오톡 등에 공유될 때 보이는 타이틀.</p>
+        <div class="field">
+          <input type="text" id="pageTitle" placeholder="규호 ❤ 태은의 결혼식에 초대합니다">
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2 — COVER -->
+    <div class="panel" data-panel="cover">
+      <div class="section-card">
+        <h3>커버 사진 선택</h3>
+        <p class="desc">청첩장 첫 화면에 풀스크린으로 보여줄 사진을 고르세요. 갤러리 사진이나 새 파일을 모두 사용할 수 있습니다.</p>
+        <div class="image-grid" id="coverGrid">
+          <div class="empty-state">사진을 불러오는 중…</div>
+        </div>
+        <label class="upload-zone" for="coverUpload">
+          <div class="icon">+</div>
+          <div class="label">새 사진 업로드</div>
+          <div class="sub">JPG / PNG / WebP · 최대 10MB</div>
+          <input type="file" id="coverUpload" accept="image/*">
+        </label>
+        <div class="upload-progress" id="coverProgress" style="display:none;">
+          <span></span>
+          <div class="bar"><div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3 — GALLERY -->
+    <div class="panel" data-panel="gallery">
+      <div class="section-card">
+        <h3>갤러리 사진 관리</h3>
+        <p class="desc">사진 위에 마우스를 올리면 순서 변경/삭제 버튼이 나타납니다. 좌우 화살표로 이동하세요.</p>
+        <div class="image-grid" id="galleryGrid">
+          <div class="empty-state">사진을 불러오는 중…</div>
+        </div>
+        <label class="upload-zone" for="galleryUpload">
+          <div class="icon">+</div>
+          <div class="label">갤러리에 사진 추가</div>
+          <div class="sub">여러 장 동시 선택 가능 · JPG / PNG / WebP</div>
+          <input type="file" id="galleryUpload" accept="image/*" multiple>
+        </label>
+        <div class="upload-progress" id="galleryProgress" style="display:none;">
+          <span></span>
+          <div class="bar"><div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4 — BGM -->
+    <div class="panel" data-panel="bgm">
+      <div class="section-card">
+        <h3>현재 배경음악</h3>
+        <p class="desc">청첩장 우측 상단의 음악 토글 버튼에 연결됩니다.</p>
+        <div class="bgm-current" id="bgmCurrent">
+          <span class="name">없음</span>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3>업로드된 음악 목록</h3>
+        <p class="desc">repo의 assets/ 폴더에 있는 mp3 파일들. 클릭해서 선택하면 배경음악으로 적용됩니다.</p>
+        <div class="bgm-list" id="bgmList">
+          <div class="empty-state">불러오는 중…</div>
+        </div>
+        <label class="upload-zone" for="bgmUpload">
+          <div class="icon">♪</div>
+          <div class="label">새 음악 업로드</div>
+          <div class="sub">MP3 권장 · 최대 10MB · 본인 라이선스 보유 음원만</div>
+          <input type="file" id="bgmUpload" accept="audio/mpeg,audio/mp3,.mp3">
+        </label>
+        <div class="upload-progress" id="bgmProgress" style="display:none;">
+          <span></span>
+          <div class="bar"><div></div></div>
+        </div>
+        <p style="font-size:11.5px; color:var(--ink-muted); margin-top:14px; line-height:1.7;">
+          ⚠ 상업 음원(스트리밍·OST 등)을 그대로 올리시면 저작권 문제가 있습니다.
+          YouTube 오디오 보관함, Pixabay Music, Free Music Archive 등 라이선스 명확한 음원만 사용하세요.
+        </p>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- ===== Save bar ===== -->
+<div class="save-bar" id="saveBar" style="display:none;">
+  <div class="save-msg" id="saveMsg">변경사항 없음</div>
+  <div class="save-btns">
+    <button class="btn ghost" id="discardBtn">되돌리기</button>
+    <button class="btn" id="saveBtn">저장하기</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Confirm modal -->
+<div class="modal" id="confirmModal">
+  <div class="modal-card">
+    <h3 id="confirmTitle">확인</h3>
+    <p id="confirmMsg">정말 진행하시겠습니까?</p>
+    <div class="actions">
+      <button class="btn ghost" id="confirmCancel">취소</button>
+      <button class="btn danger" id="confirmOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// =================== State ===================
+const STATE = {
+  auth: null,          // {owner, repo, branch, token}
+  config: null,        // current config.json content
+  configSha: null,     // sha for updating
+  originalConfig: null,// snapshot for dirty check
+  assets: [],          // [{name, sha, type: 'image'|'audio'|'other'}]
+  pendingUploads: [],  // [{path, base64, type}] — queued local files (data URIs for preview)
+  pendingDeletes: [],  // [path]
+  dirty: false,
+};
+
+// =================== Helpers ===================
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+function toast(msg, type = '') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.className = 'toast', 2400);
+}
+
+function confirmDialog(title, msg) {
+  return new Promise((resolve) => {
+    $('#confirmTitle').textContent = title;
+    $('#confirmMsg').textContent = msg;
+    $('#confirmModal').classList.add('active');
+    const cleanup = (val) => {
+      $('#confirmModal').classList.remove('active');
+      $('#confirmOk').onclick = null;
+      $('#confirmCancel').onclick = null;
+      resolve(val);
+    };
+    $('#confirmOk').onclick = () => cleanup(true);
+    $('#confirmCancel').onclick = () => cleanup(false);
+  });
+}
+
+function setDirty(d = true) {
+  STATE.dirty = d;
+  const msg = $('#saveMsg');
+  if (d) {
+    msg.textContent = '저장되지 않은 변경사항이 있습니다';
+    msg.classList.add('dirty');
+  } else {
+    msg.textContent = '변경사항 없음';
+    msg.classList.remove('dirty');
+  }
+}
+
+function fileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
+function isImage(name) { return ['jpg','jpeg','png','webp','gif'].includes(fileExt(name)); }
+function isAudio(name) { return ['mp3','m4a','ogg','wav'].includes(fileExt(name)); }
+function safeName(name) {
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9.\-_]/g, '')
+    .replace(/-+/g, '-');
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result; // "data:image/jpeg;base64,XXX"
+      const base64 = result.split(',')[1];
+      resolve({ base64, dataUri: result });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// =================== GitHub API ===================
+const GH = {
+  base: 'https://api.github.com',
+  headers() {
+    return {
+      'Authorization': 'token ' + STATE.auth.token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    };
+  },
+  async get(path) {
+    const { owner, repo, branch } = STATE.auth;
+    const url = `${this.base}/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
+    const r = await fetch(url, { headers: this.headers() });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(`GET ${path} → ${r.status}`);
+    return r.json();
+  },
+  async put(path, contentBase64, sha, message) {
+    const { owner, repo, branch } = STATE.auth;
+    const url = `${this.base}/repos/${owner}/${repo}/contents/${path}`;
+    const body = { message: message || `update ${path}`, content: contentBase64, branch };
+    if (sha) body.sha = sha;
+    const r = await fetch(url, {
+      method: 'PUT',
+      headers: { ...this.headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(`PUT ${path} → ${r.status} ${err.message || ''}`);
+    }
+    return r.json();
+  },
+  async del(path, sha, message) {
+    const { owner, repo, branch } = STATE.auth;
+    const url = `${this.base}/repos/${owner}/${repo}/contents/${path}`;
+    const r = await fetch(url, {
+      method: 'DELETE',
+      headers: { ...this.headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: message || `delete ${path}`, sha, branch }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(`DELETE ${path} → ${r.status} ${err.message || ''}`);
+    }
+    return r.json();
+  },
+  async listDir(path) {
+    const { owner, repo, branch } = STATE.auth;
+    const url = `${this.base}/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
+    const r = await fetch(url, { headers: this.headers() });
+    if (r.status === 404) return [];
+    if (!r.ok) throw new Error(`LIST ${path} → ${r.status}`);
+    const data = await r.json();
+    return Array.isArray(data) ? data : [];
+  },
+  async verifyAuth() {
+    const url = `${this.base}/repos/${STATE.auth.owner}/${STATE.auth.repo}`;
+    const r = await fetch(url, { headers: this.headers() });
+    if (r.status === 401) throw new Error('인증 실패: 토큰을 확인해 주세요');
+    if (r.status === 404) throw new Error('Repo를 찾을 수 없습니다 (owner/repo 확인)');
+    if (!r.ok) throw new Error(`접속 실패 (${r.status})`);
+    return r.json();
+  },
+};
+
+function strToBase64Utf8(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function base64ToStrUtf8(b64) {
+  return decodeURIComponent(escape(atob(b64)));
+}
+
+// =================== Auth flow ===================
+function loadStoredAuth() {
+  try {
+    const raw = localStorage.getItem('wedding-admin-auth');
+    if (raw) STATE.auth = JSON.parse(raw);
+  } catch {}
+}
+function saveAuth(auth) {
+  STATE.auth = auth;
+  localStorage.setItem('wedding-admin-auth', JSON.stringify(auth));
+}
+function clearAuth() {
+  STATE.auth = null;
+  localStorage.removeItem('wedding-admin-auth');
+}
+
+async function tryAutoLogin() {
+  loadStoredAuth();
+  if (!STATE.auth) return false;
+  try {
+    await GH.verifyAuth();
+    return true;
+  } catch {
+    clearAuth();
+    return false;
+  }
+}
+
+$('#loginBtn').addEventListener('click', async () => {
+  const owner = $('#ghOwner').value.trim();
+  const repo = $('#ghRepo').value.trim();
+  const branch = $('#ghBranch').value.trim() || 'main';
+  const token = $('#ghToken').value.trim();
+  if (!owner || !repo || !token) {
+    toast('모든 항목을 입력해 주세요', 'error');
+    return;
+  }
+  $('#loginBtn').disabled = true;
+  $('#loginBtn').innerHTML = '<span class="spinner"></span>접속 중…';
+  try {
+    saveAuth({ owner, repo, branch, token });
+    await GH.verifyAuth();
+    await enterEditor();
+  } catch (e) {
+    clearAuth();
+    toast(e.message, 'error');
+  } finally {
+    $('#loginBtn').disabled = false;
+    $('#loginBtn').textContent = '접속하기';
+  }
+});
+
+$('#logoutBtn').addEventListener('click', async () => {
+  if (STATE.dirty && !await confirmDialog('로그아웃', '저장하지 않은 변경사항이 있습니다. 로그아웃하시겠습니까?')) return;
+  clearAuth();
+  location.reload();
+});
+
+// =================== Enter Editor ===================
+async function enterEditor() {
+  $('#loginSection').style.display = 'none';
+  $('#editorSection').style.display = 'block';
+  $('#saveBar').style.display = 'flex';
+  $('#logoutBtn').style.display = 'block';
+
+  $('#metaOwner').textContent = STATE.auth.owner;
+  $('#metaRepo').textContent = STATE.auth.repo;
+  $('#metaBranch').textContent = STATE.auth.branch;
+  $('#previewBtn').href = `https://${STATE.auth.owner}.github.io/${STATE.auth.repo}/`;
+
+  await loadConfigAndAssets();
+  populateForm();
+  renderCoverGrid();
+  renderGalleryGrid();
+  renderBgmList();
+  setDirty(false);
+}
+
+async function loadConfigAndAssets() {
+  // load config.json
+  const cfgFile = await GH.get('config.json');
+  if (cfgFile) {
+    STATE.config = JSON.parse(base64ToStrUtf8(cfgFile.content.replace(/\n/g, '')));
+    STATE.configSha = cfgFile.sha;
+  } else {
+    STATE.config = defaultConfig();
+    STATE.configSha = null;
+  }
+  STATE.originalConfig = JSON.parse(JSON.stringify(STATE.config));
+
+  // list assets
+  const items = await GH.listDir('assets');
+  STATE.assets = items.filter(it => it.type === 'file').map(it => ({
+    name: it.name,
+    path: 'assets/' + it.name,
+    sha: it.sha,
+    size: it.size,
+    download_url: it.download_url,
+    type: isImage(it.name) ? 'image' : isAudio(it.name) ? 'audio' : 'other',
+  }));
+}
+
+function defaultConfig() {
+  return {
+    title: '결혼식에 초대합니다',
+    groom: { name: '', nameRoman: '' },
+    bride: { name: '', nameRoman: '' },
+    greeting: '',
+    coverImage: '',
+    gallery: [],
+    bgm: '',
+  };
+}
+
+// =================== Form (Text tab) ===================
+function populateForm() {
+  $('#groomName').value = STATE.config.groom?.name || '';
+  $('#groomRoman').value = STATE.config.groom?.nameRoman || '';
+  $('#brideName').value = STATE.config.bride?.name || '';
+  $('#brideRoman').value = STATE.config.bride?.nameRoman || '';
+  $('#greetingText').value = STATE.config.greeting || '';
+  $('#pageTitle').value = STATE.config.title || '';
+}
+
+function bindTextField(id, getter, setter) {
+  const el = $(id);
+  el.addEventListener('input', () => {
+    setter(el.value);
+    setDirty(true);
+  });
+}
+bindTextField('#groomName', null, (v) => { STATE.config.groom = STATE.config.groom || {}; STATE.config.groom.name = v; });
+bindTextField('#groomRoman', null, (v) => { STATE.config.groom = STATE.config.groom || {}; STATE.config.groom.nameRoman = v; });
+bindTextField('#brideName', null, (v) => { STATE.config.bride = STATE.config.bride || {}; STATE.config.bride.name = v; });
+bindTextField('#brideRoman', null, (v) => { STATE.config.bride = STATE.config.bride || {}; STATE.config.bride.nameRoman = v; });
+bindTextField('#greetingText', null, (v) => { STATE.config.greeting = v; });
+bindTextField('#pageTitle', null, (v) => { STATE.config.title = v; });
+
+// =================== Tabs ===================
+$$('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    $$('.tab').forEach(x => x.classList.toggle('active', x === t));
+    const target = t.dataset.tab;
+    $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === target));
+  });
+});
+
+// =================== Cover image grid ===================
+function renderCoverGrid() {
+  const grid = $('#coverGrid');
+  const images = STATE.assets.filter(a => a.type === 'image');
+  // include pending uploads as preview-only thumbs
+  const pendingImages = STATE.pendingUploads.filter(p => isImage(p.path));
+
+  if (images.length === 0 && pendingImages.length === 0) {
+    grid.innerHTML = '<div class="empty-state">아직 사진이 없습니다.<br>아래에서 새 사진을 올려보세요.</div>';
+    return;
+  }
+  const items = [
+    ...images.map(a => ({ src: a.download_url, path: a.path, pending: false })),
+    ...pendingImages.map(p => ({ src: p.dataUri, path: p.path, pending: true })),
+  ];
+  grid.innerHTML = items.map(it => {
+    const isCurrent = STATE.config.coverImage === it.path;
+    return `
+      <div class="image-thumb ${isCurrent ? 'selected' : ''}" data-path="${it.path}">
+        <img src="${it.src}" alt="">
+        ${isCurrent ? '<span class="badge">COVER</span>' : ''}
+        ${it.pending ? '<span class="order-num" style="background:var(--rose);">N</span>' : ''}
+        <div class="overlay">${isCurrent ? 'CURRENT' : 'SELECT'}</div>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.image-thumb').forEach(el => {
+    el.addEventListener('click', () => {
+      STATE.config.coverImage = el.dataset.path;
+      setDirty(true);
+      renderCoverGrid();
+    });
+  });
+}
+
+// =================== Gallery grid ===================
+function renderGalleryGrid() {
+  const grid = $('#galleryGrid');
+  const list = STATE.config.gallery || [];
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="empty-state">갤러리가 비어있습니다.<br>아래에서 사진을 추가해 주세요.</div>';
+    return;
+  }
+  grid.innerHTML = list.map((path, i) => {
+    const pending = STATE.pendingUploads.find(p => p.path === path);
+    const asset = STATE.assets.find(a => a.path === path);
+    const src = pending ? pending.dataUri : (asset ? asset.download_url : path);
+    return `
+      <div class="image-thumb" data-idx="${i}">
+        <img src="${src}" alt="">
+        <span class="order-num">${i+1}</span>
+        <div class="ctrl-row">
+          <button class="ctrl-btn" data-act="up" title="앞으로">←</button>
+          <button class="ctrl-btn" data-act="down" title="뒤로">→</button>
+          <button class="ctrl-btn del" data-act="remove" title="갤러리에서 제거">×</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.image-thumb').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    el.querySelectorAll('.ctrl-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const act = btn.dataset.act;
+        const list = STATE.config.gallery;
+        if (act === 'up' && idx > 0) {
+          [list[idx-1], list[idx]] = [list[idx], list[idx-1]];
+        } else if (act === 'down' && idx < list.length - 1) {
+          [list[idx+1], list[idx]] = [list[idx], list[idx+1]];
+        } else if (act === 'remove') {
+          list.splice(idx, 1);
+        } else return;
+        setDirty(true);
+        renderGalleryGrid();
+      });
+    });
+  });
+}
+
+// =================== BGM ===================
+function renderBgmList() {
+  const cur = $('#bgmCurrent');
+  const list = $('#bgmList');
+  const audios = STATE.assets.filter(a => a.type === 'audio');
+  const pendingAudios = STATE.pendingUploads.filter(p => isAudio(p.path));
+
+  // current
+  if (STATE.config.bgm) {
+    const asset = STATE.assets.find(a => a.path === STATE.config.bgm);
+    const pending = STATE.pendingUploads.find(p => p.path === STATE.config.bgm);
+    const src = pending ? pending.dataUri : (asset ? asset.download_url : STATE.config.bgm);
+    cur.innerHTML = `
+      <span class="name">${STATE.config.bgm.split('/').pop()}</span>
+      <audio controls src="${src}"></audio>
+    `;
+  } else {
+    cur.innerHTML = '<span class="name" style="color:var(--ink-muted);">없음 — 아래에서 선택해 주세요</span>';
+  }
+
+  // list
+  const all = [
+    ...audios.map(a => ({ name: a.name, path: a.path, pending: false })),
+    ...pendingAudios.map(p => ({ name: p.path.split('/').pop(), path: p.path, pending: true })),
+  ];
+  if (all.length === 0) {
+    list.innerHTML = '<div class="empty-state">업로드된 음악이 없습니다.</div>';
+    return;
+  }
+  list.innerHTML = all.map(a => `
+    <div class="bgm-row ${STATE.config.bgm === a.path ? 'selected' : ''}" data-path="${a.path}">
+      <span class="lname">${a.name}${a.pending ? ' (업로드 대기)' : ''}</span>
+      <span class="actions">
+        <button class="btn ghost small" data-act="select">선택</button>
+      </span>
+    </div>
+  `).join('');
+  list.querySelectorAll('.bgm-row').forEach(el => {
+    el.addEventListener('click', () => {
+      STATE.config.bgm = el.dataset.path;
+      setDirty(true);
+      renderBgmList();
+    });
+  });
+}
+
+// =================== Upload handlers ===================
+async function queueFileUpload(file, targetDir = 'assets') {
+  if (file.size > 10 * 1024 * 1024) {
+    toast(`${file.name}: 10MB 초과 — 압축 후 다시 시도해 주세요`, 'error');
+    return null;
+  }
+  const safe = safeName(file.name);
+  const path = `${targetDir}/${safe}`;
+  // dedupe
+  if (STATE.assets.find(a => a.path === path) || STATE.pendingUploads.find(p => p.path === path)) {
+    const renamed = `${targetDir}/${Date.now()}-${safe}`;
+    return queueFileUploadAt(file, renamed);
+  }
+  return queueFileUploadAt(file, path);
+}
+async function queueFileUploadAt(file, path) {
+  const { base64, dataUri } = await fileToBase64(file);
+  const entry = { path, base64, dataUri, type: file.type };
+  STATE.pendingUploads.push(entry);
+  setDirty(true);
+  return entry;
+}
+
+// Cover upload
+$('#coverUpload').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const entry = await queueFileUpload(file);
+  if (entry) {
+    STATE.config.coverImage = entry.path;
+    renderCoverGrid();
+    toast('커버 사진이 대기열에 추가되었습니다. 저장 시 업로드됩니다');
+  }
+  e.target.value = '';
+});
+
+// Gallery upload (multi)
+$('#galleryUpload').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  for (const file of files) {
+    const entry = await queueFileUpload(file);
+    if (entry) {
+      STATE.config.gallery = STATE.config.gallery || [];
+      STATE.config.gallery.push(entry.path);
+    }
+  }
+  renderGalleryGrid();
+  toast(`${files.length}장이 갤러리에 추가되었습니다 (저장 필요)`);
+  e.target.value = '';
+});
+
+// BGM upload
+$('#bgmUpload').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const entry = await queueFileUpload(file);
+  if (entry) {
+    STATE.config.bgm = entry.path;
+    renderBgmList();
+    toast('배경음악이 대기열에 추가되었습니다. 저장 시 업로드됩니다');
+  }
+  e.target.value = '';
+});
+
+// Drag & drop on upload zones
+$$('.upload-zone').forEach(zone => {
+  ['dragenter', 'dragover'].forEach(ev =>
+    zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('dragover'); })
+  );
+  ['dragleave', 'drop'].forEach(ev =>
+    zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('dragover'); })
+  );
+  zone.addEventListener('drop', (e) => {
+    const input = zone.querySelector('input[type=file]');
+    if (input && e.dataTransfer.files.length) {
+      input.files = e.dataTransfer.files;
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+});
+
+// =================== Save ===================
+$('#saveBtn').addEventListener('click', async () => {
+  if (!STATE.dirty) { toast('변경된 내용이 없습니다'); return; }
+
+  const btn = $('#saveBtn');
+  btn.disabled = true;
+
+  const ups = STATE.pendingUploads.length;
+  const total = ups + 1; // + config.json
+  let done = 0;
+  const setMsg = (msg) => { $('#saveMsg').textContent = msg; };
+
+  try {
+    // 1) Upload pending files one by one
+    for (const up of STATE.pendingUploads) {
+      done++;
+      setMsg(`업로드 ${done}/${total} — ${up.path}`);
+      btn.innerHTML = `<span class="spinner"></span>업로드 ${done}/${total}`;
+      await GH.put(up.path, up.base64, null, `upload ${up.path} (admin)`);
+    }
+
+    // 2) Save config.json
+    done++;
+    setMsg(`설정 저장 ${done}/${total}`);
+    btn.innerHTML = `<span class="spinner"></span>설정 저장 중`;
+    const json = JSON.stringify(STATE.config, null, 2) + '\n';
+    const result = await GH.put('config.json', strToBase64Utf8(json), STATE.configSha, 'update config (admin)');
+    STATE.configSha = result.content.sha;
+
+    // Reset state
+    STATE.pendingUploads = [];
+    STATE.originalConfig = JSON.parse(JSON.stringify(STATE.config));
+
+    // Reload assets list to get fresh URLs
+    const items = await GH.listDir('assets');
+    STATE.assets = items.filter(it => it.type === 'file').map(it => ({
+      name: it.name,
+      path: 'assets/' + it.name,
+      sha: it.sha,
+      size: it.size,
+      download_url: it.download_url,
+      type: isImage(it.name) ? 'image' : isAudio(it.name) ? 'audio' : 'other',
+    }));
+
+    setDirty(false);
+    renderCoverGrid();
+    renderGalleryGrid();
+    renderBgmList();
+    toast('저장 완료! GitHub Pages에 1~2분 후 반영됩니다', 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '저장하기';
+  }
+});
+
+$('#discardBtn').addEventListener('click', async () => {
+  if (!STATE.dirty) return;
+  if (!await confirmDialog('되돌리기', '모든 변경사항을 되돌리시겠습니까?')) return;
+  STATE.config = JSON.parse(JSON.stringify(STATE.originalConfig));
+  STATE.pendingUploads = [];
+  populateForm();
+  renderCoverGrid();
+  renderGalleryGrid();
+  renderBgmList();
+  setDirty(false);
+});
+
+// =================== Init ===================
+(async function init() {
+  if (await tryAutoLogin()) {
+    await enterEditor();
+  }
+})();
+</script>
+</body>
+</html>
